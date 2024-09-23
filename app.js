@@ -17,12 +17,12 @@ const init = async () => {
         // GET route to fetch a sample of movies from the 'movies' collection
         app.get('/foods', async (req, res) => {
             try {
-                const foods = await db.collection('foods')
+                const food = await db.collection('foods')
                     .find()
                     .limit(30) // Limit to 10 movies for demonstration
                     .toArray();
 
-                res.status(200).json(foods);
+                res.status(200).json(food);
             } catch (err) {
                 console.error(err);
                 res.status(500).json({ error: 'Could not fetch the movies' });
