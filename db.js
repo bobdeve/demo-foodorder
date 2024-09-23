@@ -23,7 +23,7 @@ const init = async () => {
             try {
                 const food = await db.collection('foods')
                     .find()
-                    .limit(30)
+                    .limit(35)
                     .toArray();
 
                 res.status(200).json(food);
