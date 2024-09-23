@@ -19,7 +19,7 @@ const init = async () => {
             try {
                 const foods = await db.collection('foods')
                     .find()
-                    .limit(10) // Limit to 10 movies for demonstration
+                    .limit(30) // Limit to 10 movies for demonstration
                     .toArray();
 
                 res.status(200).json(foods);
