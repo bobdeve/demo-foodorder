@@ -1,20 +1,20 @@
-const express = require('express');
-const cors = require('cors'); // Import cors
-const { connectionToDb, getDb } = require('./db');
-const { ObjectId } = require('mongodb');
+const express = require('express'); // Import Express framework
+const cors = require('cors'); // Import CORS middleware
+const { connectionToDb, getDb } = require('./db'); // Import database connection functions
+const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 
-const app = express();
+const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
-app.use(express.json());
+app.use(express.json()); // Parse incoming JSON requests
 
-let db;
+let db; // Variable to hold the database instance
 
 const init = async () => {
     try {
         await connectionToDb(); // Establish connection to the database
         db = getDb(); // Get the database instance
 
-        console.log('Connected to the database');
+        console.log('Connected to the database'); // Log successful connection
 
         // GET route to fetch a sample of foods from the 'foods' collection
         app.get('/foods', async (req, res) => {
@@ -22,22 +22,46 @@ const init = async () => {
                 const food = await db.collection('foods')
                     .find()
                     .limit(30) // Limit to 30 foods for demonstration
-                    .toArray();
+                    .toArray(); // Convert cursor to array
 
-                res.status(200).json(food);
+                return res.status(200).json(food); // Respond with the food array
             } catch (err) {
-                console.error(err);
-                res.status(500).json({ error: 'Could not fetch the foods' });
+                console.error('Error fetching foods:', err); // Log error
+                return res.status(500).json({ error: 'Could not fetch the foods' }); // Respond with error
             }
         });
 
-        // Start the server
+        // GET route to fetch a food item by ID
+        app.get('/foods/:id', async (req, res) => {
+            const id = req.params.id; // Get ID from request parameters
+
+            // Validate ObjectId format
+            if (!ObjectId.isValid(id)) {
+                return res.status(400).json({ error: 'Invalid ID format' }); // Respond with error for invalid ID
+            }
+
+            const objectId = new ObjectId(id); // Instantiate ObjectId
+
+            try {
+                const food = await db.collection('foods').findOne({ _id: objectId }); // Fetch food by ID
+                
+                if (!food) {
+                    return res.status(404).json({ error: 'Food item not found' }); // Handle not found
+                }
+                return res.status(200).json(food); // Respond with the food item
+            } catch (err) {
+                console.error('Error getting food:', err); // Log error
+                return res.status(500).json({ error: 'Error getting food' }); // Respond with error
+            }
+        });
+
+        // Start the server on port 3000
         app.listen(3000, () => {
-            console.log('App listening on port 3000');
+            console.log('App listening on port 3000'); // Log server start
         });
     } catch (err) {
-        console.error('Failed to connect to the database:', err);
+        console.error('Failed to connect to the database:', err); // Log connection error
     }
 };
 
-init();
+init(); // Initialize the application
