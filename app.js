@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require('cors'); // Import cors
 const { connectionToDb, getDb } = require('./db');
 const { ObjectId } = require('mongodb');
 
 const app = express();
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
 let db;
@@ -14,18 +16,18 @@ const init = async () => {
 
         console.log('Connected to the database');
 
-        // GET route to fetch a sample of movies from the 'movies' collection
+        // GET route to fetch a sample of foods from the 'foods' collection
         app.get('/foods', async (req, res) => {
             try {
                 const food = await db.collection('foods')
                     .find()
-                    .limit(30) // Limit to 10 movies for demonstration
+                    .limit(30) // Limit to 30 foods for demonstration
                     .toArray();
 
                 res.status(200).json(food);
             } catch (err) {
                 console.error(err);
-                res.status(500).json({ error: 'Could not fetch the movies' });
+                res.status(500).json({ error: 'Could not fetch the foods' });
             }
         });
 
