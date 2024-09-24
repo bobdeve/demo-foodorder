@@ -55,6 +55,25 @@ const init = async () => {
             }
         });
 
+        app.post('/foods', async (req, res) => {
+            const food = req.body;
+        
+            // // Validate the incoming data (you can add more validation based on your schema)
+            // if (!food.name) {
+            //     return res.status(400).json({ error: 'Name and price are required' });
+            // }
+        
+            try {
+                const result = await db.collection('userData').insertOne(food);
+                res.status(201).json({ message: 'Food item created', foodId: result.insertedId }); // Send back the inserted ID
+            } catch (err) {
+                console.error('Error inserting food:', err);
+                res.status(500).json({ error: 'Failed to create food item' });
+            }
+        });
+        
+
+
         // Start the server on port 3000
         app.listen(3000, () => {
             console.log('App listening on port 3000'); // Log server start
