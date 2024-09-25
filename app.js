@@ -30,6 +30,20 @@ const init = async () => {
                 return res.status(500).json({ error: 'Could not fetch the foods' }); // Respond with error
             }
         });
+        // GET route to fetch a sample of foods from the 'foods' collection
+        app.get('/history', async (req, res) => {
+            try {
+                const food = await db.collection('userData')
+                    .find()
+                    .limit(30) // Limit to 30 foods for demonstration
+                    .toArray(); // Convert cursor to array
+
+                return res.status(200).json(food); // Respond with the food array
+            } catch (err) {
+                console.error('Error fetching foods:', err); // Log error
+                return res.status(500).json({ error: 'Could not fetch the foods' }); // Respond with error
+            }
+        });
 
         // GET route to fetch a food item by ID
         app.get('/foods/:id', async (req, res) => {
