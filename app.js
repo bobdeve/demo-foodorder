@@ -1,15 +1,15 @@
 const express = require('express'); // Import Express framework
 const cors = require('cors'); // Import CORS middleware
+require('dotenv').config();  // Add this line to load environment variables
 const { connectionToDb, getDb } = require('./db'); // Import database connection functions
 const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
-require('dotenv').config();
 
 
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse incoming JSON requests
-
-const stripe = require('stripe')(process.env.STRIPE_SCERET);
+const stripeKey = process.env.STRIPE_SECRET
+const stripe = require('stripe')(stripeKey);
 
 
 let db; // Variable to hold the database instance
