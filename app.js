@@ -2,6 +2,8 @@ const express = require('express'); // Import Express framework
 const cors = require('cors'); // Import CORS middleware
 const { connectionToDb, getDb } = require('./db'); // Import database connection functions
 const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
+require('dotenv').config();
+
 
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
