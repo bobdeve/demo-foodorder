@@ -6,8 +6,8 @@ const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse incoming JSON requests
-const aa ='sk_test_51Q5O66BnIlYJQo7pkm8SCSPeLhAzhPio6TLASsvezN09GidpYDVOpAkNCKjCJJie1QLrTcndLDgPSqk8tx92OFH900PiET2N0j'
-const stripe = require('stripe')(aa);
+
+const stripe = require('stripe')(process.env.STRIPE_SCERET);
 
 
 let db; // Variable to hold the database instance
@@ -89,38 +89,37 @@ const init = async () => {
             }
         });
        
+        
+
         app.post("/create-checkout-session", async (req, res) => {
-            const { items } = req.body; // Get items from request body
+            const { items } = req.body;
             const lineItems = items.map((item) => ({
                 price_data: {
                     currency: "usd",
                     product_data: {
                         name: item.name,
-                        images: [item.image]
+                        images: [item.image],
                     },
-                    unit_amount: Math.round(parseFloat(item.price) * 100) // Convert price to cents
+                    unit_amount: Math.round(parseFloat(item.price) * 100),
                 },
-                quantity: 1 // Set default quantity to 1
+                quantity: 1,
             }));
         
             try {
-                // Create Stripe session
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
                     line_items: lineItems,
                     mode: 'payment',
-                    success_url: `${req.headers.origin}/success`,
-                    cancel_url: `${req.headers.origin}/cancel`,
+                    success_url: `http://localhost:3000/success`, // Hard-coded success URL
+                    cancel_url: `http://localhost:3000/cancel`,   // Hard-coded cancel URL
                 });
         
-                // Send the session ID back to the frontend
                 res.json({ id: session.id });
             } catch (err) {
-                console.error('Error creating checkout session:', err); // Log the complete error
-                res.status(500).json({ error: 'Failed to create checkout session', details: err.message }); // Send detailed error
+                console.error('Error creating checkout session:', err);
+                res.status(500).json({ error: 'Failed to create checkout session', details: err.message });
             }
         });
-        
         
 
         // Start the server on port 3000
