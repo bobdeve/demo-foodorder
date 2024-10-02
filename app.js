@@ -8,7 +8,7 @@ const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse incoming JSON requests
-const stripeKey = process.env.STRIPE_SECRET
+const stripeKey = process.env.STRIPE_SECRET // creating connnection with .env for stripe key
 const stripe = require('stripe')(stripeKey);
 
  
