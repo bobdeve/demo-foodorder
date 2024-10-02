@@ -6,7 +6,8 @@ const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse incoming JSON requests
-const stripe = require('stripe')(process.env.STRIPE_SCERET);
+const aa ='sk_test_51Q5O66BnIlYJQo7pkm8SCSPeLhAzhPio6TLASsvezN09GidpYDVOpAkNCKjCJJie1QLrTcndLDgPSqk8tx92OFH900PiET2N0j'
+const stripe = require('stripe')(aa);
 
 
 let db; // Variable to hold the database instance
