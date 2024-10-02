@@ -11,7 +11,7 @@ app.use(express.json()); // Parse incoming JSON requests
 const stripeKey = process.env.STRIPE_SECRET
 const stripe = require('stripe')(stripeKey);
 
-
+ 
 let db; // Variable to hold the database instance
 
 const init = async () => {
