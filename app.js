@@ -6,6 +6,8 @@ const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse incoming JSON requests
+const stripe = require('stripe')(process.env.STRIPE_SCERET);
+
 
 let db; // Variable to hold the database instance
 
@@ -85,8 +87,40 @@ const init = async () => {
                 res.status(500).json({ error: 'Failed to create food item' });
             }
         });
+       
+        app.post("/create-checkout-session", async (req, res) => {
+            const { items } = req.body; // Get items from request body
+            const lineItems = items.map((item) => ({
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: item.name,
+                        images: [item.image]
+                    },
+                    unit_amount: Math.round(parseFloat(item.price) * 100) // Convert price to cents
+                },
+                quantity: 1 // Set default quantity to 1
+            }));
         
-
+            try {
+                // Create Stripe session
+                const session = await stripe.checkout.sessions.create({
+                    payment_method_types: ['card'],
+                    line_items: lineItems,
+                    mode: 'payment',
+                    success_url: `${req.headers.origin}/success`,
+                    cancel_url: `${req.headers.origin}/cancel`,
+                });
+        
+                // Send the session ID back to the frontend
+                res.json({ id: session.id });
+            } catch (err) {
+                console.error('Error creating checkout session:', err); // Log the complete error
+                res.status(500).json({ error: 'Failed to create checkout session', details: err.message }); // Send detailed error
+            }
+        });
+        
+        
 
         // Start the server on port 3000
         app.listen(3000, () => {
