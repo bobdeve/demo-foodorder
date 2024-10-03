@@ -106,7 +106,7 @@ const init = async () => {
                 },
                 quantity: 1,
             }));
-        
+            
             try {
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
