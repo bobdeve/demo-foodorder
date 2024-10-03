@@ -95,6 +95,11 @@ const init = async () => {
 
         app.post("/create-checkout-session", async (req, res) => {
             const { items } = req.body;
+            console.log('Received items:', items);  // Log the items received
+            if (!items || items.length === 0) {
+                return res.status(400).json({ error: 'No items provided' });
+            }
+        
             const lineItems = items.map((item) => ({
                 price_data: {
                     currency: "usd",
@@ -104,16 +109,16 @@ const init = async () => {
                     },
                     unit_amount: Math.round(parseFloat(item.price) * 100),
                 },
-                quantity: 1,
+                quantity: item.quantity,  // Use the correct quantity here
             }));
-            
+        
             try {
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
                     line_items: lineItems,
                     mode: 'payment',
-                    success_url: `https://restaurant-food-ordering-app.netlify.app/`, // Hard-coded success URL
-                    cancel_url: `http://localhost:3000/cancel`,   // Hard-coded cancel URL
+                    success_url: `https://restaurant-food-ordering-app.netlify.app/`,
+                    cancel_url: `http://localhost:3000/cancel`,
                 });
         
                 res.json({ id: session.id });
@@ -122,6 +127,7 @@ const init = async () => {
                 res.status(500).json({ error: 'Failed to create checkout session', details: err.message });
             }
         });
+        
         
 
         // Start the server on port 3000
