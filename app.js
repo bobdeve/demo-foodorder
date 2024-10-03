@@ -112,7 +112,7 @@ const init = async () => {
                     payment_method_types: ['card'],
                     line_items: lineItems,
                     mode: 'payment',
-                    success_url: `http://localhost:3000/success`, // Hard-coded success URL
+                    success_url: `https://restaurant-food-ordering-app.netlify.app/`, // Hard-coded success URL
                     cancel_url: `http://localhost:3000/cancel`,   // Hard-coded cancel URL
                 });
         
