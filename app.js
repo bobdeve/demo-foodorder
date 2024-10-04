@@ -120,8 +120,8 @@ const init = async () => {
                     payment_method_types: ['card'],      // Payment method types accepted (only card in this case)
                     line_items: lineItems,               // Line items to be purchased in the session
                     mode: 'payment',                    // Mode of the session (payment for one-time payment)
-                    success_url: `https://66ffba11fe8a2d0008d310fe--restaurant-food-ordering-app.netlify.app/success`, // Success URL (redirect after successful payment)
-                    cancel_url: `https://66ffba11fe8a2d0008d310fe--restaurant-food-ordering-app.netlify.app/failed`,   // Cancel URL (redirect if payment is canceled)
+                    success_url: `https://restaurant-food-ordering-app.netlify.app/success`, // Success URL (redirect after successful payment)
+                    cancel_url: `https://restaurant-food-ordering-app.netlify.app/failed`,   // Cancel URL (redirect if payment is canceled)
                 });
 
                 // Send session ID back to client as JSON response
