@@ -11,7 +11,7 @@ app.use(express.json()); // Parse incoming JSON requests
 const stripeKey = process.env.STRIPE_SECRET // creating connnection with .env for stripe key
 const stripe = require('stripe')(stripeKey);
 
- 
+
 let db; // Variable to hold the database instance
 
 const init = async () => {
@@ -63,7 +63,7 @@ const init = async () => {
 
             try {
                 const food = await db.collection('foods').findOne({ _id: objectId }); // Fetch food by ID
-                
+
                 if (!food) {
                     return res.status(404).json({ error: 'Food item not found' }); // Handle not found
                 }
@@ -76,12 +76,12 @@ const init = async () => {
 
         app.post('/foods', async (req, res) => {
             const food = req.body;
-        
+
             // // Validate the incoming data (you can add more validation based on your schema)
             // if (!food.name) {
             //     return res.status(400).json({ error: 'Name and price are required' });
             // }
-        
+
             try {
                 const result = await db.collection('userData').insertOne(food);
                 res.status(201).json({ message: 'Food item created', foodId: result.insertedId }); // Send back the inserted ID
@@ -90,45 +90,50 @@ const init = async () => {
                 res.status(500).json({ error: 'Failed to create food item' });
             }
         });
-       
-        
 
+
+
+        // Endpoint to handle POST requests for creating a checkout session
         app.post("/create-checkout-session", async (req, res) => {
+            // Destructure 'items' array from request body
             const { items } = req.body;
-            console.log('Received items:', items);  // Log the items received
-            if (!items || items.length === 0) {
-                return res.status(400).json({ error: 'No items provided' });
-            }
-        
+
+           
+
+            // Map 'items' array to create line items for Stripe checkout session
             const lineItems = items.map((item) => ({
+                // Define price data for each item
                 price_data: {
-                    currency: "usd",
+                    currency: "usd",                    // Currency code (USD in this case)
                     product_data: {
-                        name: item.name,
-                        images: [item.image],
+                        name: item.name,                // Product name from client
+                        images: [item.image],           // Array of product images from client
                     },
-                    unit_amount: Math.round(parseFloat(item.price) * 100),
+                    unit_amount: Math.round(parseFloat(item.price) * 100), // Unit amount in cents (convert price to cents)
                 },
-                quantity: item.quantity,  // Use the correct quantity here
+                quantity: item.quantity,                // Quantity of the item
             }));
-        
+
             try {
+                // Create a checkout session with Stripe API
                 const session = await stripe.checkout.sessions.create({
-                    payment_method_types: ['card'],
-                    line_items: lineItems,
-                    mode: 'payment',
-                    success_url: `https://restaurant-food-ordering-app.netlify.app/`,
-                    cancel_url: `http://localhost:3000/cancel`,
+                    payment_method_types: ['card'],      // Payment method types accepted (only card in this case)
+                    line_items: lineItems,               // Line items to be purchased in the session
+                    mode: 'payment',                    // Mode of the session (payment for one-time payment)
+                    success_url: `https://66ffba11fe8a2d0008d310fe--restaurant-food-ordering-app.netlify.app/success`, // Success URL (redirect after successful payment)
+                    cancel_url: `http://localhost:3000/cancel`,   // Cancel URL (redirect if payment is canceled)
                 });
-        
+
+                // Send session ID back to client as JSON response
                 res.json({ id: session.id });
             } catch (err) {
+                // Handle errors during session creation
                 console.error('Error creating checkout session:', err);
+                // Send 500 status and error details back to client
                 res.status(500).json({ error: 'Failed to create checkout session', details: err.message });
             }
         });
-        
-        
+
 
         // Start the server on port 3000
         app.listen(3000, () => {
