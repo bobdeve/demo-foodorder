@@ -119,7 +119,11 @@ const init = async () => {
                     success_url: `https://restaurant-food-ordering-app.netlify.app/success`,
                     cancel_url: `https://restaurant-food-ordering-app.netlify.app/failed`,
                 });
-        
+
+
+                //    // Send session ID back to client as JSON response
+                //    res.json({ id: session.id });
+            console.log(session);
                 // Send the full session URL to the client
                 res.json({ url: session.url });
             } catch (err) {
