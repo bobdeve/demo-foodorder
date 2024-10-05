@@ -95,44 +95,39 @@ const init = async () => {
 
         // Endpoint to handle POST requests for creating a checkout session
         app.post("/create-checkout-session", async (req, res) => {
-            // Destructure 'items' array from request body
             const { items } = req.body;
-
-           
-
+        
             // Map 'items' array to create line items for Stripe checkout session
             const lineItems = items.map((item) => ({
-                // Define price data for each item
                 price_data: {
-                    currency: "usd",                    // Currency code (USD in this case)
+                    currency: "usd",
                     product_data: {
-                        name: item.name,                // Product name from client
-                        images: [item.image],           // Array of product images from client
+                        name: item.name,
+                        images: [item.image],
                     },
-                    unit_amount: Math.round(parseFloat(item.price) * 100), // Unit amount in cents (convert price to cents)
+                    unit_amount: Math.round(parseFloat(item.price) * 100), // Convert price to cents
                 },
-                quantity: item.quantity,                // Quantity of the item
+                quantity: item.quantity,
             }));
-
+        
             try {
                 // Create a checkout session with Stripe API
                 const session = await stripe.checkout.sessions.create({
-                    payment_method_types: ['card'],      // Payment method types accepted (only card in this case)
-                    line_items: lineItems,               // Line items to be purchased in the session
-                    mode: 'payment',                    // Mode of the session (payment for one-time payment)
-                    success_url: `https://restaurant-food-ordering-app.netlify.app/success`, // Success URL (redirect after successful payment)
-                    cancel_url: `https://restaurant-food-ordering-app.netlify.app/failed`,   // Cancel URL (redirect if payment is canceled)
+                    payment_method_types: ['card'],
+                    line_items: lineItems,
+                    mode: 'payment',
+                    success_url: `https://restaurant-food-ordering-app.netlify.app/success`,
+                    cancel_url: `https://restaurant-food-ordering-app.netlify.app/failed`,
                 });
-
-                // Send session ID back to client as JSON response
-                res.json({ id: session.id });
+        
+                // Send the full session URL to the client
+                res.json({ url: session.url });
             } catch (err) {
-                // Handle errors during session creation
                 console.error('Error creating checkout session:', err);
-                // Send 500 status and error details back to client
                 res.status(500).json({ error: 'Failed to create checkout session', details: err.message });
             }
         });
+        
 
 
         // Start the server on port 3000
